@@ -5,6 +5,7 @@ export const STYLE_MAP = {
   yellow: {
     backgroundColor: '#FFC900'
   },
+  
   normal: {
     backgroundColor: '#FFFFFF',
     borderColor: '#A5A5A5',
@@ -19,7 +20,10 @@ export const STYLE_MAP = {
     backgroundColor: '#FFFFFF',
     borderColor: '#EE9900',
     borderWidth: '1px'
+  },
+  green:{
   }
+  
 };
 
 export const TEXT_STYLE_MAP = {
