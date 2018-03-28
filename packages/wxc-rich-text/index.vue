@@ -16,7 +16,8 @@
                             :link-href="v.href"
                             :link-style="v.style"
                             :has-text-margin="hasTextMargin"
-                            :link-theme="v.theme"></wxc-rich-text-link>
+                            :link-theme="v.theme"
+                            @wxcRichTextLinkClick="wxcRichTextLinkClick"></wxc-rich-text-link>
 
         <wxc-rich-text-icon v-if="v.type=='icon' && v.src"
                             :icon-src="v.src"
