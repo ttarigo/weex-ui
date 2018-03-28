@@ -12,13 +12,17 @@
 </template>
 
 <script>
-  import { STYLE_MAP, TEXT_STYLE_MAP } from './type'
+  import { STYLE_MAP, TEXT_STYLE_MAP, BUTTON_STYLE_MAP, TEXT_FONTSIZE_STYLE_MAP } from './type';
 
   export default {
     props: {
       text: {
         type: String,
         default: '确认'
+      },
+      size: {
+        type: String,
+        default: 'none'
       },
       type: {
         type: String,
@@ -33,30 +37,38 @@
     },
     computed: {
       mrBtnStyle () {
-        const { type, disabled, btnStyle } = this;
+        const { type, disabled, btnStyle, size } = this;
+
         const mrBtnStyle = {
           ...STYLE_MAP[type],
-          ...btnStyle
+          ...btnStyle,
+          ...BUTTON_STYLE_MAP[size]
         };
+
+        let disableStyle = { opacity: 0.2 };
+        if (type === 'white') {
+          disableStyle = { backgroundColor: 'rgba(0, 0, 0, 0.1)' };
+        }
+
         return disabled ? {
           ...mrBtnStyle,
-          backgroundColor: 'rgba(0, 0, 0, 0.1)',
+          ...disableStyle,
           borderWidth: 0
         } : mrBtnStyle;
       },
       mrTextStyle () {
-        const { type, disabled, textStyle } = this;
-        const mrTextStyle = { ...TEXT_STYLE_MAP[type], ...textStyle };
+        const { type, disabled, textStyle, size } = this;
+        const mrTextStyle = { ...TEXT_STYLE_MAP[type], ...textStyle, ...TEXT_FONTSIZE_STYLE_MAP[size] };
         return disabled ? { ...mrTextStyle, color: '#FFFFFF' } : mrTextStyle;
       }
     },
     methods: {
       onClicked (e) {
         const { type, disabled } = this;
-        this.$emit('wxcButtonClicked', { e, type, disabled })
+        this.$emit('wxcButtonClicked', { e, type, disabled });
       }
     }
-  }
+  };
 </script>
 
 <style scoped>
@@ -66,13 +78,13 @@
     align-items: center;
     justify-content: center;
     border-radius: 12px;
+    opacity: 1;
   }
 
   .btn-text {
     text-overflow: ellipsis;
     lines: 1;
     font-size: 36px;
-    color: #FFFFFF;
+    color: #ffffff;
   }
-
 </style>

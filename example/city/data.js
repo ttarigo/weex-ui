@@ -1,6 +1,5 @@
 export default {
   hotCity: [
-    { cityName: '北京', pinYin: 'beijing', py: 'bj' },
     { cityName: '上海', pinYin: 'shanghai', py: 'sh' },
     { cityName: '天津', pinYin: 'tianjin', py: 'tj' },
     { cityName: '青岛', pinYin: 'qingdao', py: 'qd' },
@@ -14,7 +13,6 @@ export default {
     { cityName: '武汉', pinYin: 'wuhan', py: 'wh' }
   ],
   cities: [
-    { cityName: '北京', pinYin: 'beijing', py: 'bj' },
     { cityName: '包头', pinYin: 'baotou', py: 'bt' },
     { cityName: '北海', pinYin: 'beihai', py: 'bh' },
     { cityName: '宝鸡', pinYin: 'baoji', py: 'bj' },

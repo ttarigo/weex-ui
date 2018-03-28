@@ -13,7 +13,7 @@
 <template>
   <div class="wxc-demo">
     <scroller class="scroller">
-      <div class="btn" @click="showCity">
+      <div class="btn" @click="showListCity">
         <text class="btn-txt">City Select</text>
       </div>
       <div class="panel">
@@ -21,81 +21,43 @@
       </div>
     </scroller>
     <wxc-city ref="wxcCity"
-              :normal-list="normalList"
-              :only-show-list="onlyShowList"
-              :hot-list-config="hotListConfig"
-              :city-location-config="cityLocationConfig"
+              :animationType="animationType"
+              :currentLocation="location"
+              :cityStyleType="cityStyleType"
               @wxcCityItemSelected="citySelect"
               @wxcCityOnInput="onInput"></wxc-city>
   </div>
 </template>
 <script>
-
-   //city data https://github.com/alibaba/weex-ui/blob/master/example/city/data.js 
-  import sourceData from './data';
-  import * as Util from 'weex-ui/packages/wxc-city/util';
+   // Delete the data source configuration and use the default data.
   import { WxcCity } from 'weex-ui';
-
   export default {
     components: { WxcCity },
     data: () => ({
+      animationType: 'push',
       currentCity: '',
-      sourceData,
-      onlyShowList: false,
+      cityStyleType:'list',
       location: 'Positioning'
     }),
-    created () {
-      this.defaultSourceData = sourceData;
-    },
     mounted () {
       // Analog positioning
       setTimeout(() => {
         this.location = 'Hangzhou';
       }, 500);
     },
-    computed: {
-      // City Data
-      normalList () {
-        return Util.getCities(this.sourceData.cities)
-      },
-      hotListConfig () {
-        return {
-          type: 'list',
-          title: 'Hot',
-          list: Util.getCities(this.sourceData.hotCity)
-        }
-      },
-      cityLocationConfig () {
-        return {
-          type:'list',
-          title: 'Location',
-          list: [
-            { name: this.location, isLocation: true }
-          ]
-        }
-      }
-    },
     methods: {
-      showCity () {
+      showListCity () {
+        this.cityStyleType = 'list'
+        this.$refs['wxcCity'].show();
+      },
+      showGroupCity () {
+        this.cityStyleType = 'group'
         this.$refs['wxcCity'].show();
       },
       citySelect (e) {
         this.currentCity = e.item;
       },
       onInput (e) {
-        const { cities } = this.defaultSourceData;
-        const { value } = e;
-        if (value !== '' && cities && cities.length > 0) {
-          const queryData = Util.query(cities, String(value).trim());
-          this.sourceData = {
-            cities: queryData,
-            hotCity: []
-          };
-          this.onlyShowList = true;
-        } else {
-          this.sourceData = this.defaultSourceData;
-          this.onlyShowList = false;
-        }
       }
     }
   };
@@ -108,12 +70,12 @@ More details can be found in [here](https://github.com/alibaba/weex-ui/blob/mast
 | Prop | Type | Required | Default | Description |
 | ---- |:----:|:---:|:-------:| :----------:|
 | **`input-config`** | `Object` | `N` | `{}` | Search Input configuration (*1)|
-| **`normal-list`** | `Array` | `Y` | `[]` | Common city list array configuration (*2) |
-| **`hot-list-config`** | `Object` | `N` | `{}` | Hot city list configuration (*3) |
-| **`city-location-config`** | `Object` | `N` | `{}` | Location city configuration (*4) |
-| **`only-show-list`** | `Boolean` | `N` | `false` | Whether or not it is searching, only a search list |
+| **`sourceData`** | `Object` | `N` | `Default China City data` | City data configuration (*2) |
+| **`cityStyleType`** | `String` | `N` | `list` | Style configuration (*3) |
+| **`currentLocation`** | `String` | `Y` | `` | Location of the city configuration (*4) |
 | **`show-index`** | `Boolean` | `N` | `true` | Whether the right index item is displayed|
 | **`city-height`** | `Number` | `N` | `0` | Custom City height, **non special business do not set up!**|
+| **`animationType`** | `String` | `N` | `push` | Support model or push type|
 
 - *1：Search Input configuration：
 
@@ -124,29 +86,20 @@ More details can be found in [here](https://github.com/alibaba/weex-ui/blob/mast
         placeholder: 'Search'
       }
     ```
-    
-- *2：Common City list configuration, Detailed as CityList can be see in [data.js](https://github.com/alibaba/weex-ui/blob/master/example/city/data.js)
-- *3：Hot city list configuration, Support for projects in the form of `group` or `list`, Detailed as hotCity can be see in [data.js](https://github.com/alibaba/weex-ui/blob/master/example/city/data.js)：
-
-  ```
-  {
-    type: 'group',
-    title: 'Hot',
-    list: hotCity
-  }
-  ```
-- *4：Location city configuration, detailed as follows：
+- *2：City data configuration，Detailed as CityList can be see in [data.js](https://github.com/alibaba/weex-ui/blob/master/example/city/data.js)
  
+  ```example
+    {
+        hotCity: [
+            { cityName: '北京', pinYin: 'beijing', py: 'bj' }
+        ],
+        cities: [
+            { cityName: '北京', pinYin: 'beijing', py: 'bj' }
+        ]
+    }
   ```
-  {
-    type: 'group',
-    title: '全部',
-    list: [
-      { name: `Location`, isLocation: true },
-      { name: 'Total City', desc: 'Airport City' }
-    ]
-  }
-  ```
+- *3：Style configuration，type：`group`，`list`
+- *4：Location of the city configuration，example：Hangzhou
 
 
 ### Event

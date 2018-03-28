@@ -6,23 +6,35 @@
     <scroller class="scroller">
       <title title="wxc-city" class="title"></title>
       <category title="使用案例"></category>
-      <div class="btn" @click="showListCity">
-        <text class="btn-txt">列 城市选择</text>
+      <div class="btn" @click="showListCityPush">
+      <text class="btn-txt">列 城市选择(push)</text>
+    </div>
+      <div class="btn btn-margin yellow" @click="showGroupCityPush">
+        <text class="btn-txt">组 城市选择(push)</text>
       </div>
-
-      <div class="btn btn-margin yellow" @click="showGroupCity">
-        <text class="btn-txt">组 城市选择</text>
+      <div class="btn" @click="showListCityModel">
+        <text class="btn-txt">列 城市选择(model)</text>
       </div>
-
+      <div class="btn btn-margin yellow" @click="showGroupCityModel">
+        <text class="btn-txt">组 城市选择(model)</text>
+      </div>
       <div class="panel">
         <text v-if="currentCity" class="text">当前城市: {{currentCity}}</text>
       </div>
     </scroller>
-    <wxc-city ref="wxcCity"
-              :normal-list="normalList"
-              :only-show-list="onlyShowList"
-              :hot-list-config="hotListConfig"
-              :city-location-config="cityLocationConfig"
+    <!-- push方式演示 -->
+    <wxc-city ref="wxcCityPush"
+              :animationType="animationTypePush"
+              :currentLocation="location"
+              :cityStyleType="cityStyleType"
+              :sourceData="sourceData"
+              @wxcCityItemSelected="citySelect"
+              @wxcCityOnInput="onInput"></wxc-city>
+    <!-- model方式演示 -->
+    <wxc-city ref="wxcCityModel"
+              :animationType="animationTypeModel"
+              :currentLocation="location"
+              :cityStyleType="cityStyleType"
               @wxcCityItemSelected="citySelect"
               @wxcCityOnInput="onInput"></wxc-city>
   </div>
@@ -39,70 +51,44 @@
     data: () => ({
       currentCity: '',
       sourceData,
-      hotCityType: 'list',
-      locationCityType: 'list',
-      onlyShowList: false,
-      location: '定位中'
+      cityStyleType:'list',
+      location: '定位中',
+      animationTypePush:'push', // 默认使用push方式，若使用push模式此参数可以不传
+      animationTypeModel:'model'
     }),
-    created () {
-      this.defaultSourceData = sourceData;
-    },
     mounted () {
       // 模拟定位
       setTimeout(() => {
         this.location = '杭州';
       }, 500);
     },
-    computed: {
-      // 城市数据
-      normalList () {
-        return Util.getCities(this.sourceData.cities)
-      },
-      hotListConfig () {
-        return {
-          type: this.hotCityType,
-          title: '热门',
-          list: Util.getCities(this.sourceData.hotCity)
-        }
-      },
-      cityLocationConfig () {
-        return {
-          type: this.locationCityType,
-          title: '定位',
-          list: [
-            { name: this.location, isLocation: true }
-          ]
-        }
-      }
-    },
     methods: {
-      showListCity () {
-        this.hotCityType = 'list';
-        this.locationCityType = 'list';
-        this.$refs['wxcCity'].show();
+      showListCityPush () {
+        this.cityStyleType = 'list'
+        // 默认使用push方式，若使用push模式此参数可以不传
+        this.animationTypePush = 'push'
+        this.$refs['wxcCityPush'].show();
       },
-      showGroupCity () {
-        this.hotCityType = 'group';
-        this.locationCityType = 'group';
-        this.$refs['wxcCity'].show();
+      showGroupCityPush () {
+        this.cityStyleType = 'group'
+        // 默认使用push方式，若使用push模式此参数可以不传
+        this.animationTypePush = 'push'
+        this.$refs['wxcCityPush'].show();
+      },
+      showListCityModel () {
+        this.cityStyleType = 'list'
+        this.animationTypePush = 'model'
+        this.$refs['wxcCityModel'].show();
+      },
+      showGroupCityModel () {
+        this.cityStyleType = 'group'
+        this.animationTypeModel = 'model'
+        this.$refs['wxcCityModel'].show();
       },
       citySelect (e) {
         this.currentCity = e.item;
       },
       onInput (e) {
-        const { cities } = this.defaultSourceData;
-        const { value } = e;
-        if (value !== '' && cities && cities.length > 0) {
-          const queryData = Util.query(cities, String(value).trim());
-          this.sourceData = {
-            cities: queryData,
-            hotCity: []
-          };
-          this.onlyShowList = true;
-        } else {
-          this.sourceData = this.defaultSourceData;
-          this.onlyShowList = false;
-        }
       }
     }
   };
@@ -126,7 +112,7 @@
     width: 600px;
     height: 80px;
     margin-left: 75px;
-    margin-top: 300px;
+    margin-top:100px;
     flex-direction: row;
     align-items: center;
     justify-content: center;

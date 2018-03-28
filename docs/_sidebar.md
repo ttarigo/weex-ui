@@ -4,6 +4,7 @@
     - [wxc-ep-slider](packages/wxc-ep-slider/)
     - [wxc-lightbox](packages/wxc-lightbox/)
     - [wxc-overlay](packages/wxc-overlay/)
+    - [wxc-popover](packages/wxc-popover/)
     - [wxc-popup](packages/wxc-popup/)
     - [wxc-result](packages/wxc-result/)
     - [wxc-slide-nav](packages/wxc-slide-nav/)
@@ -43,6 +44,9 @@
 - Service
    - [utils](packages/utils/) 
    
-- [**How to use with weex-toolkit**](docs/with-weex-toolkit)
-- [**FQA**](docs/faq)
+- [**Weex + Ui - Weex Conf 2018**](docs/weex-ui-weex-conf-2018)
+- [**Use Weex Ui with weex-toolkit**](docs/with-weex-toolkit)
+- [**FAQ**](docs/faq)
 - [**CHANGELOG**](CHANGELOG)
+- [Who is using Weex Ui?](docs/who_use.md)
+

@@ -3,7 +3,7 @@
 <!--A City -->
 
 <template>
-  <div class="wxc-city" ref="city">
+  <div class="wxc-city" ref="city" :style="cityExtendStyle">
     <wxc-searchbar ref="wxc-searchbar"
                    v-bind="mergeInputConfig"
                    @wxcSearchbarInputOnInput="onInput"
@@ -20,7 +20,7 @@
                    :height="listHeight"
                    :show-index="showIndex"
                    :only-show-list="onlyShowList"
-                   :city-location-config="cityLocationConfig"
+                   :city-location-config="currentCityLocationConfig"
                    @wxcIndexlistItemClicked="onItemClick"></wxc-indexlist>
 
     <wxc-result type="noGoods"
@@ -32,8 +32,8 @@
 </template>
 
 <script>
-  const animation = weex.requireModule('animation');
-
+  import defaultSourceData from './default-data';
+  import * as Util from './util';
   import Utils from '../utils';
   import wxcTab from './tab.vue';
   import WxcSearchbar from '../wxc-searchbar'
@@ -43,31 +43,28 @@
   export default {
     components: { wxcTab, WxcSearchbar, WxcResult, WxcIndexlist },
     props: {
+      animationType: {
+        type: String,
+        default: 'push'
+      },
       inputConfig: {
         type: Object,
         default: () => ({})
       },
-      normalList: {
-        type: Array,
-        default: () => ([])
+      sourceData: {
+        type: Object,
+        default: () => defaultSourceData
       },
+      cityStyleType: {
+        type: String,
+        default: 'list'
+      },
+      currentLocation: String,
       cityHeight: {
         type: Number,
         default: 0
       },
       showTab: {
-        type: Boolean,
-        default: false
-      },
-      hotListConfig: {
-        type: Object,
-        default: () => ({})
-      },
-      cityLocationConfig: {
-        type: Object,
-        default: () => ({})
-      },
-      onlyShowList: {
         type: Boolean,
         default: false
       },
@@ -78,6 +75,8 @@
     },
     data: () => ({
       tId: null,
+      saveDefaultSourceData: {},
+      onlyShowList: false,
       result: {
         noGoods: {
           pic: 'https://img.alicdn.com/tfs/TB1SpPHkf2H8KJjy0FcXXaDlFXa-200-200.png',
@@ -86,7 +85,36 @@
         }
       }
     }),
+    created () {
+      this.saveDefaultSourceData = this.sourceData
+    },
     computed: {
+      cityExtendStyle () {
+        return Utils.uiStyle.pageTransitionAnimationStyle(this.animationType)
+      },
+      currentCityLocationConfig () {
+        if (this.currentLocation) {
+          return {
+            type: this.cityStyleType,
+            title: '定位',
+            list: [
+              { name: this.currentLocation, isLocation: true }
+            ]
+          }
+        } else {
+          return {};
+        }
+      },
+      normalList () {
+        return Util.getCities(this.sourceData.cities)
+      },
+      hotListConfig () {
+        return {
+          type: this.cityStyleType,
+          title: '热门',
+          list: Util.getCities((this.sourceData.hotCity))
+        }
+      },
       showError () {
         const { normalList, hotListConfig } = this;
         return (normalList && normalList.length < 1) && (hotListConfig && hotListConfig.list && hotListConfig.list.length < 1)
@@ -99,7 +127,6 @@
         if (cityHeight && !isNaN(cityHeight) && cityHeight > 0) {
           pageHeight = cityHeight;
         }
-
         // searchInput 84
         const tabHeight = this.showTab ? 90 : 0;
         return pageHeight - 84 - tabHeight;
@@ -129,6 +156,19 @@
       },
       onInput (e) {
         clearTimeout(this.tId);
+        const { cities } = this.sourceData;
+        const { value } = e;
+        if (value !== '' && cities && cities.length > 0) {
+          const queryData = Util.query(cities, String(value).trim());
+          this.sourceData = {
+            cities: queryData,
+            hotCity: []
+          };
+          this.onlyShowList = true;
+        } else {
+          this.sourceData = this.saveDefaultSourceData;
+          this.onlyShowList = false;
+        }
         this.tId = setTimeout(() => {
           this.$emit('wxcCityOnInput', {
             value: e.value
@@ -149,16 +189,12 @@
         inputRef && inputRef.autoBlur();
       },
       show (status = true, callback = null) {
-        animation.transition(this.$refs.city, {
-          styles: {
-            transform: `translateX(${status ? -750 : 750}px)`
-          },
-          duration: status ? 250 : 300, // ms
-          timingFunction: status ? 'ease-in' : 'ease-out',
-          delay: 0 // ms
-        }, function () {
-          callback && callback();
-        });
+        const ref = this.$refs.city
+        if (this.animationType === 'push') {
+          Utils.animation.pageTransitionAnimation(ref, `translateX(${status ? -750 : 750}px)`, status, callback)
+        } else if (this.animationType === 'model') {
+          Utils.animation.pageTransitionAnimation(ref, `translateY(${status ? -Utils.env.getScreenHeight() : Utils.env.getScreenHeight()}px)`, status, callback)
+        }
       }
     }
   };
@@ -168,10 +204,6 @@
   .wxc-city {
     position: fixed;
     width: 750px;
-    top: 0;
-    left: 750px;
-    right: 0;
-    bottom: 0;
     background-color: #F2F3F4;
   }
 </style>
